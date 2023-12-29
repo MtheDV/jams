@@ -23,13 +23,13 @@ const useAuth = defineStore('auth', {
             return (await supabase.auth.getSession()).data.session
         },
         async signInWithSpotify() {
-            const response = await supabase.auth.signInWithOAuth({
+            // This will trigger the 'SIGNED_IN' event in the supabase events
+            await supabase.auth.signInWithOAuth({
                 provider: 'spotify',
                 options: {
                     scopes: 'user-read-playback-state user-modify-playback-state'
                 }
             })
-            console.log(response)
         },
         async signOut() {
             await supabase.auth.signOut()
