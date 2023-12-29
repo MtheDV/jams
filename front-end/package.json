@@ -10,7 +10,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
-    "generate-types": "npx supabase gen types typescript --project-id \"egzlytobdbdxricadshv\" --schema public > src/types/supabase.ts\n"
+    "generate-types": "source .env && npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > src/types/supabase.ts\n"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.37.0",
