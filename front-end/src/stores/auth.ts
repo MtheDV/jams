@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import supabase from '../supabase'
-import axios from 'axios'
 import { SpotifyLocalStorage } from '@/types/spotify'
 
 const useAuth = defineStore('auth', {
@@ -21,7 +20,6 @@ const useAuth = defineStore('auth', {
     },
     actions: {
         async getSession() {
-            supabase.auth.refreshSession()
             return (await supabase.auth.getSession()).data.session
         },
         async signInWithSpotify() {
@@ -56,7 +54,7 @@ const useAuth = defineStore('auth', {
                 }
             })
             if (!response.data.access_token) return
-            
+
             // Set our new auth data that was returned
             this.setSpotifyAccessToken(response.data.access_token)
             this.setSpotifyRefreshTimeout(response.data.expires_in * 1000)

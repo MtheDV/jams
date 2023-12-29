@@ -9,7 +9,7 @@ supabase.auth.onAuthStateChange((event) => {
     const store = useAuth()
     store.spotify = {
         refreshToken: localStorage.getItem(SpotifyLocalStorage.RefreshToken),
-        refreshTimeout: localStorage.getItem(SpotifyLocalStorage.RefreshTimeout),
+        refreshTimeout: Number(localStorage.getItem(SpotifyLocalStorage.RefreshTimeout) ?? 0),
         accessToken: localStorage.getItem(SpotifyLocalStorage.AccessToken)
     }
 })
