@@ -22,6 +22,9 @@ const useAuth = defineStore('auth', {
         async getSession() {
             return (await supabase.auth.getSession()).data.session
         },
+        async refreshSession() {
+            await supabase.auth.refreshSession()
+        },
         async signInWithSpotify() {
             // This will trigger the 'SIGNED_IN' event in the supabase events
             await supabase.auth.signInWithOAuth({
@@ -32,6 +35,7 @@ const useAuth = defineStore('auth', {
             })
         },
         async signOut() {
+            // This will trigger the 'SIGNED_OUT' event in the supabase events
             await supabase.auth.signOut()
         },
         async getSpotifyAccessToken() {

@@ -1,43 +1,55 @@
 import { defineStore } from 'pinia'
 import supabase from '@/supabase'
 import type { Tables } from '@/types/supabase'
-import useAuth from '@/stores/auth'
+import ShortUniqueId from 'short-unique-id'
+
+const { randomUUID } = new ShortUniqueId({ length: 6 })
 
 const useRooms = defineStore('rooms', {
     state(): {
         loading: boolean
-        rooms: Pick<Tables<'rooms'>, 'key' | 'user_id'>[] | null
+        rooms: Tables<'rooms'>[]
     } {
         return {
             loading: false,
-            rooms: null
+            rooms: []
         }
     },
     actions: {
+        async get(short_id: string) {
+            // Look through the rooms and see if we have the id
+            const room = this.rooms.find((room) => room.short_id === short_id)
+            if (room) return room
+
+            // Otherwise run a query to find the room in the database and return that instead
+            const roomsResponse = await supabase.from('rooms').select('*').eq('short_id', short_id)
+            return roomsResponse.data?.[0]
+        },
         async refresh() {
-            // Will get all the available rooms, with minimized details
+            // Begin loading
             this.loading = true
-            const roomsResponse = await supabase.from('rooms').select('key,user_id')
-            this.rooms = roomsResponse.data
+
+            // Fetch the data from our rooms table and set it to our rooms state
+            const roomsResponse = await supabase.from('rooms').select('*')
+            this.rooms = roomsResponse.data ?? []
+
+            // Finalize the loading
             this.loading = false
         },
         async create() {
-            // Get the user id and ensure we have one
-            const userId = (await useAuth().getSession())?.user.id
-            if (!userId) return null
-
-            // Create a new room with the current user and get it from the returned data
+            // Create a new room entry in our database
+            // Generate a new short_id for our room
             const newRoomResponse = await supabase
                 .from('rooms')
                 .insert({
-                    user_id: userId
+                    short_id: randomUUID()
                 })
                 .select()
-            const newRoom = newRoomResponse.data?.[0]
-
-            // If we have a new room created, update the current rooms list and return the new room
-            if (!newRoom) return null
-            return newRoom.key
+            return newRoomResponse.data?.[0]
+        },
+        async delete(short_id: string) {
+            // Remove the specified room
+            await supabase.from('rooms').delete().eq('short_id', short_id)
         }
     }
 })
