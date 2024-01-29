@@ -1,7 +1,11 @@
-export enum SpotifyLocalStorage {
-    AccessToken = 'spotify:accessToken',
-    RefreshToken = 'spotify:refreshToken',
-    RefreshTimeout = 'spotify:refreshTimeout'
+export enum SpotifyBroadcastEvent {
+    UpdatedNowPlaying = 'spotify:updated'
+}
+
+export enum SpotifyIdbKey {
+    AccessToken = 'spotify:access',
+    RefreshToken = 'spotify:refresh',
+    RefreshTimeout = 'spotify:timeout'
 }
 
 export interface SpotifyResponseError {

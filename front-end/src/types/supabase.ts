@@ -13,18 +13,21 @@ export interface Database {
         Row: {
           id: number
           last_active: string
+          room_id: string
           short_id: string
           user_id: string
         }
         Insert: {
           id?: number
           last_active?: string
+          room_id?: string
           short_id: string
           user_id?: string
         }
         Update: {
           id?: number
           last_active?: string
+          room_id?: string
           short_id?: string
           user_id?: string
         }

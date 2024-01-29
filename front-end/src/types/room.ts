@@ -1,3 +1,9 @@
+export enum RoomBroadcastEvent {
+    EnsureUnique = 'room:unique',
+    EnsureUniqueError = 'room:unique:error',
+    UsersUpdated = 'users:updated'
+}
+
 export interface RoomUser {
     id: string
     userId: string
@@ -8,8 +14,6 @@ export interface RoomUser {
 
 export enum RoomError {
     NoUserSession = 'no_user_session',
-    UserNotOwner = 'user_not_owner',
-    UserAlreadyJoined = 'user_already_joined',
-    UnableToBroadcast = 'broadcast_error',
-    RoomUnavailable = 'room_unavailable'
+    RoomUnavailable = 'room_unavailable',
+    RoomCreate = 'error_creating'
 }
