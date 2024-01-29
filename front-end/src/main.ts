@@ -11,5 +11,8 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
+// Add our events for supabase
+import './supabase/events'
+
 // Mount the app to begin
 app.mount('#app')

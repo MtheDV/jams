@@ -13,7 +13,7 @@ const useAuth = defineStore('auth', {
             await supabase.auth.signInWithOAuth({
                 provider: 'spotify',
                 options: {
-                    scopes: 'user-read-playback-state user-modify-playback-state'
+                    scopes: 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
                 }
             })
         },
