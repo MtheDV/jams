@@ -1,6 +1,4 @@
 export enum RoomBroadcastEvent {
-    EnsureUnique = 'room:unique',
-    EnsureUniqueError = 'room:unique:error',
     UsersUpdated = 'users:updated'
 }
 

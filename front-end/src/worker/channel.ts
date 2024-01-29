@@ -33,7 +33,14 @@ export const openChannel = async (
     // Return a promise to set up our channel and resolve once complete
     return new Promise<RealtimeChannel>((resolve) => {
         // Create a channel to connect to
-        const channel = supabase.channel(id)
+        // Send messages to self to simplify the code
+        const channel = supabase.channel(id, {
+            config: {
+                broadcast: {
+                    self: true
+                }
+            }
+        })
 
         // Store a value of available users
         let users: RoomUser[] = []
@@ -68,15 +75,7 @@ export const openChannel = async (
 
         // Add the events specified in the events object
         Object.entries(events).forEach(([event, callback]) => {
-            channel.on('broadcast', { event }, callback)
-        })
-
-        // Add the unique user broadcast to send an error if the user already exists
-        channel.on('broadcast', { event: RoomBroadcastEvent.EnsureUnique }, (payload) => {
-            if (payload.data.userId !== session.user.id) return
-            broadcastToChannel(channel, RoomBroadcastEvent.EnsureUniqueError, {
-                userId: session.user.id
-            })
+            channel.on('broadcast', { event }, (event) => callback(event.data))
         })
 
         // Subscribe the channel

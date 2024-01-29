@@ -21,15 +21,16 @@ export const connect = async (
 
     // If we're the owner, start broadcasting spotify details
     const userId = (await supabase.auth.getUser()).data.user?.id
-    if (userId && room.user_id === userId) {
-        state.room.broadcastIntervalId = setRoomBroadcastSpotifyInterval(onNowPlayingUpdate)
+    const isOwner = room.user_id === userId
+    if (userId && isOwner) {
+        state.room.broadcastIntervalId = setRoomBroadcastSpotifyInterval()
         state.room.activeIntervalId = setRoomActiveInterval(room.room_id)
     }
 
     // Connect and set the new channel
     state.room.channel = await openChannel(room.room_id, room.user_id, {
         [SpotifyBroadcastEvent.UpdatedNowPlaying]: async (newNowPlaying: SpotifyNowPlaying) => {
-            await updateNowPlaying(state.spotify.nowPlaying, newNowPlaying)
+            if (!isOwner) await updateNowPlaying(state.spotify.nowPlaying, newNowPlaying)
             onNowPlayingUpdate(newNowPlaying)
         },
         [RoomBroadcastEvent.UsersUpdated]: (newUsers: RoomUser[]) => {
@@ -56,25 +57,18 @@ export const disconnect = async () => {
     state.spotify = {}
 }
 
-const setRoomBroadcastSpotifyInterval = (
-    onNowPlayingUpdate: (nowPlaying: SpotifyNowPlaying) => void
-): NodeJS.Timeout => {
+const setRoomBroadcastSpotifyInterval = (): NodeJS.Timeout => {
     return setInterval(async () => {
         // Get the now playing state and broadcast it to the channel
         state.spotify.nowPlaying = await getNowPlaying()
         if (!state.room.channel || !state.spotify.nowPlaying) return
 
-        // Update the current users now playing data
-        // and broadcast it to the other users
-        state.spotify.onNowPlayingUpdate?.(state.spotify.nowPlaying)
+        // Broadcast it to everyone in the room
         await broadcastToChannel(
             state.room.channel,
             SpotifyBroadcastEvent.UpdatedNowPlaying,
             state.spotify.nowPlaying
         )
-
-        // Update the current users now playing state
-        onNowPlayingUpdate(state.spotify.nowPlaying)
     }, 1000)
 }
 
