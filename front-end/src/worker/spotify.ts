@@ -1,6 +1,7 @@
 import supabase from '@/supabase'
 import { get, set } from 'idb-keyval'
 import { SpotifyIdbKey, type SpotifyNowPlaying } from '@/types/spotify'
+import state from '@/worker/state'
 
 export const getSpotifyAccessToken = async (): Promise<undefined | string> => {
     // Get our data required from our idb-keyval

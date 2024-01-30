@@ -30,10 +30,17 @@ export const connect = async (
     // Connect and set the new channel
     state.room.channel = await openChannel(room.room_id, room.user_id, {
         [SpotifyBroadcastEvent.UpdatedNowPlaying]: async (newNowPlaying: SpotifyNowPlaying) => {
+            // Update the now playing if we're not the owner
             if (!isOwner) await updateNowPlaying(state.spotify.nowPlaying, newNowPlaying)
+
+            // Callback to update the frontend
             onNowPlayingUpdate(newNowPlaying)
+
+            // Update the new now playing state
+            state.spotify.nowPlaying = newNowPlaying
         },
         [RoomBroadcastEvent.UsersUpdated]: (newUsers: RoomUser[]) => {
+            // Callback to update the frontend
             onUsersUpdate(newUsers)
         }
     })
@@ -60,14 +67,14 @@ export const disconnect = async () => {
 const setRoomBroadcastSpotifyInterval = (): NodeJS.Timeout => {
     return setInterval(async () => {
         // Get the now playing state and broadcast it to the channel
-        state.spotify.nowPlaying = await getNowPlaying()
-        if (!state.room.channel || !state.spotify.nowPlaying) return
+        const newNowPlaying = await getNowPlaying()
+        if (!state.room.channel || !newNowPlaying) return
 
         // Broadcast it to everyone in the room
         await broadcastToChannel(
             state.room.channel,
             SpotifyBroadcastEvent.UpdatedNowPlaying,
-            state.spotify.nowPlaying
+            newNowPlaying
         )
     }, 1000)
 }
