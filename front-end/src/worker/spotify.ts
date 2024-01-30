@@ -60,7 +60,7 @@ export const setNowPlaying = async (nowPlaying: SpotifyNowPlaying) => {
             Authorization: `Bearer ${accessToken}`
         },
         body: JSON.stringify({
-            uris: [nowPlaying.context.uri],
+            uris: [nowPlaying.item.uri],
             position_ms: nowPlaying.progress_ms
         })
     })
